@@ -1,0 +1,70 @@
+Step 1: Import necessary libraries: Pandas, Scikit-learn, and metrics for Logistic Regression.
+ import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+
+
+Step 2: Load the dataset heart_disease_data.csv and display the first 5 rows.
+data=pd.read_csv("heart_disease_data.csv")
+print("the First 5 values of data is :\n")
+data.head()
+
+
+Step 3: Encode categorical variables, converting SmokingStatus and HeartDisease to
+numerical labels using LabelEncoder.
+label_encoder = LabelEncoder()
+data['SmokingStatus'] = label_encoder.fit_transform(data['SmokingStatus'])
+data['HeartDisease'] = label_encoder.fit_transform(data['HeartDisease'])
+
+
+Step 4: Define feature variables X and print the first 5 rows.
+X = data[['Age', 'CholesterolLevel', 'BloodPressure', 'SmokingStatus']]
+X.head()
+
+Step 5: Define the target variable y and display the first 5 rows.
+y = data[['HeartDisease']]
+y.head()
+
+
+Step 6: Split the data into training and testing sets using train_test_split.
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+random_state=42) 
+
+
+Step 7: Scale the feature variables using StandardScaler.
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+
+
+Step 8: Initialize and fit the Logistic Regression model on the training data.
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+
+Step 9: Make predictions using the test data with model.predict().
+y_pred = model.predict(X_test)
+
+
+
+Step 10: Calculate the model's accuracy, confusion matrix, and classification report.
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+class_report = classification_report(y_test, y_pred)
+
+
+
+Step 11: Print the accuracy, confusion matrix, and classification report.
+print(f'Accuracy: {accuracy:.2f}')
+print('Confusion Matrix:')
+print(conf_matrix)
+print('Classification Report:')
+print(class_report)
+
+
+
+
