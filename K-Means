@@ -1,0 +1,36 @@
+1.Import necessary libraries
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+
+2.Load the Data
+df = pd.read_csv('Ex6.csv')
+
+
+3. Display the first few rows of the dataset
+print(df.head())
+
+
+4.Apply K-Means Clustering
+kmeans = KMeans(n_clusters=2, random_state=0)
+kmeans.fit(df)
+
+
+5. Add cluster labels to the original DataFrame
+df['Cluster'] = kmeans.labels_
+
+
+6.Display the first few rows with cluster labels
+print(df.head())
+
+
+
+7. Visualize the Clusters
+plt.figure(figsize=(10, 8))
+plt.scatter(df['Feature1'], df['Feature2'], c=df['Cluster'], cmap='viridis', s=50)
+plt.title('K-Means Clustering')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.show()
