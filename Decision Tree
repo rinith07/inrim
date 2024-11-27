@@ -1,0 +1,56 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score,
+precision_score, recall_score, f1_score
+
+
+1.Load dataset
+data = pd.read_csv('Ex4.csv')
+
+
+
+2.Data preprocessing
+# One-Hot Encoding for categorical variable 'Gender'
+data = pd.get_dummies(data, columns=['Gender'], drop_first=True)
+
+
+3.Verify columns after one-hot encoding
+print(data.columns)
+
+
+4.Splitting the dataset into the Training set and
+Test set
+X = data.drop('TargetVariable', axis=1) # Adjust to your actual target
+variable name
+y = data['TargetVariable']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25,
+random_state=0)
+
+
+5.Building the Decision Tree model
+classifier = DecisionTreeClassifier(random_state=0)
+classifier.fit(X_train, y_train)
+
+
+
+6.Making predictions
+y_pred = classifier.predict(X_test)
+
+
+
+7.Performance evaluation
+cm = confusion_matrix(y_test, y_pred)
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+
+8.Outputting results
+print("Confusion Matrix:\n", cm)
+print(f"Accuracy: {accuracy:.2f}")
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+print(f"F1 Score: {f1:.2f}")
+
