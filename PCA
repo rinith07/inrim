@@ -1,0 +1,55 @@
+1.Import necessary libraries
+import pandas as pd
+import numpy as np
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+2.Load the dataset
+df = pd.read_csv('Ex4.csv')
+
+
+
+3.Display the first few rows of the dataset
+print(df.head())
+
+
+4.Features for PCA
+features = ['Age', 'Annual Income', 'Spending Score', 'Number of Purchases']
+X = df[features]
+
+
+5.Standardize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+
+6. Apply PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+
+
+7. Create a DataFrame with PCA results
+df_pca = pd.DataFrame(data=X_pca, columns=['PC1', 'PC2'])
+df_pca['Cluster'] = df['Cluster']
+
+
+
+8.Plot the PCA results
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='PC1', y='PC2', hue='Cluster', data=df_pca, palette='viridis')
+plt.title('PCA Result - Customer Segmentation')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend(title='Cluster')
+plt.show()
+
+
+
+9.Explained variance
+explained_variance = pca.explained_variance_ratio_
+print(f'Explained variance by each component: {explained_variance}')
+print(f'Total explained variance: {np.sum(explained_variance)}')
