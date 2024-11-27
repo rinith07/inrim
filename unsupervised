@@ -1,0 +1,101 @@
+1. Import Library Files
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+
+
+2. Load the Iris dataset
+iris = load_iris()
+X = pd.DataFrame(iris.data, columns=iris.feature_names)
+
+
+3. Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+
+4. Apply K-Means clustering
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+kmeans = KMeans(n_clusters=3, random_state=42)
+kmeans_labels = kmeans.fit_predict(X_scaled)
+
+
+
+5. Evaluate the clustering performance
+kmeans_silhouette = silhouette_score(X_scaled, kmeans_labels)
+print(f'K-Means Silhouette Score: {kmeans_silhouette}')
+
+6. Convert the dataset to PyTorch tensors
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+X_tensor = torch.tensor(X_scaled, dtype=torch.float32)
+
+
+
+
+7. Create a DataLoader
+data_loader = DataLoader(TensorDataset(X_tensor), batch_size=16, shuffle=True)
+
+
+
+8. Define the Autoencoder model
+class Autoencoder(nn.Module):
+def __init__(self):
+super(Autoencoder, self).__init__()
+self.encoder = nn.Sequential(
+nn.Linear(4, 2), # Compress to 2 dimensions
+nn.ReLU()
+)
+self.decoder = nn.Sequential(
+nn.Linear(2, 4), # Reconstruct the original input
+nn.ReLU()
+)
+def forward(self, x):
+encoded = self.encoder(x)
+decoded = self.decoder(encoded)
+return decoded
+
+
+
+
+9. Initialize the model, loss function, and optimizer
+autoencoder = Autoencoder()
+criterion = nn.MSELoss()
+optimizer = optim.Adam(autoencoder.parameters(), lr=0.01)
+
+
+
+
+10. Train the Autoencoder
+num_epochs = 100
+for epoch in range(num_epochs):
+for data in data_loader:
+inputs, = data
+optimizer.zero_grad()
+outputs = autoencoder(inputs)
+loss = criterion(outputs, inputs)
+loss.backward()
+optimizer.step()
+
+
+
+
+11. Use the encoder part to reduce dimensionality
+with torch.no_grad():
+encoded_data = autoencoder.encoder(X_tensor).numpy()
+
+
+
+12. Apply K-Means on the encoded data
+encoded_kmeans = KMeans(n_clusters=3, random_state=42)
+encoded_kmeans_labels = encoded_kmeans.fit_predict(encoded_data)
+
+
+
+
+13. Evaluate the performance
+encoded_silhouette = silhouette_score(X_scaled, encoded_kmeans_labels)
+print(f'Autoencoder + K-Means Silhouette Score: {encoded_silhouette}')
