@@ -1,0 +1,102 @@
+1. Import necessary libraries
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.offline as pyoff
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+
+
+2. Load the data
+data = pd.read_csv('Ex8.csv')
+data.info()
+
+
+
+3. Rename columns for clarity
+data.columns = ['Id', 'Clump Thickness', 'Uniformity of Cell Size', 'Uniformity of Cell Shape', 'Marginal
+Adhesion', 'Single Epithelial Cell Size', 'Bare Nuclei', 'Bland Chromatin', 'Normal Nucleoli', 'Mitoses','Class']
+
+
+4. Plot the target balance
+target_balance = data['Class'].value_counts().reset_index()
+target_balance.columns = ['Class', 'Count']
+target_class = go.Bar(
+name='Target Balance',
+x=target_balance['Class'].astype(str),
+y=target_balance['Count']
+)
+fig = go.Figure(target_class)
+pyoff.iplot(fig)
+
+
+
+5. Record of Mitosis in Benign and Malignant Groups
+beg_class_pat = data.loc[data['Class'] == 2]
+mal_class_pat = data.loc[data['Class'] == 4]
+Mith_10_beg = beg_class_pat['Mitoses'].value_counts().reset_index()
+Mith_10_beg.columns = ['Mitoses', 'Count']
+Mith_10_mal = mal_class_pat['Mitoses'].value_counts().reset_index()
+Mith_10_mal.columns = ['Mitoses', 'Count']
+
+
+
+6.Plot Mitoses distribution
+fig = go.Figure(data=[
+go.Bar(name='Levels of Mitoses in Benign Group', x=Mith_10_beg['Mitoses'].astype(str),
+y=Mith_10_beg['Count']),
+go.Bar(name='Levels of Mitoses in Malignant Group', x=Mith_10_mal['Mitoses'].astype(str),
+y=Mith_10_mal['Count']),
+])
+fig.update_layout(barmode='group')
+fig.show()
+
+
+
+7.Prepare data for KNN and Drop the 'Id' column as it's not a feature
+for prediction
+X = data.drop(columns=['Id', 'Class'])
+y = data['Class']
+
+
+
+8.Check unique values in 'Bare Nuclei' column
+print("Unique values in 'Bare Nuclei':", X['Bare Nuclei'].unique())
+
+
+
+9. Convert 'Bare Nuclei' to numeric, coercing errors to NaN
+X['Bare Nuclei'] = pd.to_numeric(X['Bare Nuclei'], errors='coerce')
+
+
+
+10.Fill NaN values with the median of the column
+X = X.fillna(X.median())
+
+
+11.Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+
+12. Standardize the data
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+
+
+13.Train a KNN model
+knn = KNeighborsClassifier(n_neighbors=5) # You can experiment with different values for k
+knn.fit(X_train_scaled, y_train)
+
+
+14. Make predictions
+y_pred = knn.predict(X_test_scaled)
+
+
+15.Evaluate the model
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Classification Report:\n", classification_report(y_test, y_pred))
